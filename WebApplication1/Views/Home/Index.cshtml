@@ -1,0 +1,162 @@
+﻿@using Newtonsoft.Json;
+@model List<OEEOrdem>
+
+@{
+    ViewData["Title"] = "Home Page";
+    int rows = 0;
+}
+
+<style>
+    .jqtl-event-title {
+        display: none !important;
+    }
+
+    .jqtl-side-index {
+        display: none !important;
+    }
+
+    .jqtl-container {
+        border-radius: 1rem;
+        overflow-x: hidden;
+        margin: 0 auto;
+    }
+
+    .jqtl-headline-wrapper {
+        flex-direction: column;
+        justify-content: center;
+        padding: 1rem 0;
+        row-gap: 0.5rem;
+    }
+
+
+
+</style>
+
+
+<select name="" id="Scale">
+    <option value="minute">Meia Hora</option>
+    <option value="hour" selected>Hora</option>
+    <option value="day">Dia</option>
+</select>
+
+<div id="myTimeline">
+    <ul class="timeline-events">
+        @foreach (var item in Model) {
+            <li data-timeline-node="{ start:'@item.DataInicial.ToString("yyyy-MM-dd HH:mm")' , end:'@item.DataFinal.ToString("yyyy-MM-dd HH:mm")',row: @item.idx  }">
+                <span class="event-label">@item.DescricaoOrdem</span>
+                <div class="event-content">
+                    <div class="row">
+                        <h3 class="text-center">@item.PostoNome</h3>
+
+                        <div class="row text-center mt-4 mb-4">
+
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title">Disponibilidade</h3>
+                                        <span>@Math.Round(item.Disponibilidade,2) %</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title">Eficiencia</h3>
+                                        <span>@Math.Round(item.Eficiencia,2) %</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title">Qualidade</h3>
+                                        <span>@Math.Round(item.Qualidade,2) %</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3 class="card-title">OEE</h3>
+                                        <span>@Math.Round(item.OEE,2) %</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-center">Tempos</h5>
+                                        <p>Data Inicial : @item.DataInicial</p>
+                                        <p>Data Final : @item.DataFinal</p>
+                                        <p>Tempo de Ordem : @TimeSpan.FromSeconds(item.TempoOrdem)</p>
+                                        <p>Tempo de Eventos: @TimeSpan.FromSeconds(item.TempoEventos)</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-center">Ordem</h5>
+                                        <p>Descrição : @item.DescricaoOrdem</p>
+                                        <p>Numero : @item.NumeroOrdem</p>
+                                        <p>Item : @item.Item</p>        
+                                        <p>Operador : @item.Operador</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-center">Produção</h5>
+                                        <p>Produzido : @item.Produzido</p>
+                                        <p>Refugado : @item.Refugado</p>
+                                        <p>Tempo Real : @Math.Round(item.TempoReal,2)</p>
+                                        <p>Tempo Teorico : @Math.Round(item.TempoTeorico,2) </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                     
+       
+                                                
+
+                    </div>
+                    
+                </div>
+            </li>
+
+            @foreach(var evento in item.Eventos.Where(x=> x.CodigoTipo !="S")) {
+                <li data-timeline-node="{ start:'@evento.Data.ToString("yyyy-MM-dd HH:mm")' , end:'@evento.Data.AddSeconds(evento.Tempo).ToString("yyyy-MM-dd HH:mm")',bgColor: '@evento.BgCor', color: '@evento.FtCor' ,row: 3, extend: { key: 2 } }">
+                    <span class="event-label">@evento.DescricaoEvento</span>
+
+                    <div class="event-content">
+                        <div class="row">
+                            <h3 class="text-center">@evento.DescricaoEvento</h3>
+
+                            <p>Data Inicial : @evento.Data</p>
+                            <p>Data Final : @evento.Data.AddSeconds(evento.Tempo)</p>
+                            <p>Tempo: @TimeSpan.FromSeconds(evento.Tempo)</p>
+                            <p>Tipo: @evento.DescricaoTipo</p>
+                            
+                        </div>
+
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+
+
+</div>
+
+<div class="timeline-event-view"></div>
